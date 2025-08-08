@@ -1,0 +1,863 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "url": "=https://r.jina.ai/https://www.trendyol.com/sr?q={{ $('Webhook').item.json.body.code }}&qt={{ $('Webhook').item.json.body.code }}&st={{ $('Webhook').item.json.body.code }}&os=1 ",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          400,
+          -920
+        ],
+        "id": "684980db-ff91-4e30-a5e1-c853575f70f4",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "multipleMethods": true,
+          "httpMethod": [
+            "POST"
+          ],
+          "path": "feb5e803-cbe9-47e7-9abd-79f741100d47",
+          "options": {
+            "responseData": "=Veriler alındı ve işleniyor."
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -640,
+          -920
+        ],
+        "id": "18fb38e5-dc3d-4e0b-a692-fed5522d745e",
+        "name": "Webhook",
+        "webhookId": "feb5e803-cbe9-47e7-9abd-79f741100d47"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "761d6c1a-80fd-41e4-b80c-020723b14fdf",
+                "leftValue": "={{ $json.output.status }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1120,
+          -940
+        ],
+        "id": "0448437b-2e68-4f8f-874a-520c50830eea",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "url": "=https://r.jina.ai/https://www.hepsiburada.com/ara?q={{ $('Webhook').item.json.body.code }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2280,
+          -160
+        ],
+        "id": "753aa19e-66ba-427b-a330-d8e9eac621ee",
+        "name": "HTTP Request2"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "761d6c1a-80fd-41e4-b80c-020723b14fdf",
+                "leftValue": "={{ $json.output.status }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          3000,
+          -180
+        ],
+        "id": "7b742aa1-8a49-410a-bfc0-5ec4b040642d",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "url": "=https://r.jina.ai/https://www.n11.com/arama?q={{ $('Webhook').item.json.body.code }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1420,
+          -580
+        ],
+        "id": "cec56e2d-4999-4a7e-b160-2a3136c532ec",
+        "name": "HTTP Request4"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "761d6c1a-80fd-41e4-b80c-020723b14fdf",
+                "leftValue": "={{ $json.output.status }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2140,
+          -600
+        ],
+        "id": "470d6f1a-615f-46be-aa97-e2fe04319406",
+        "name": "If2"
+      },
+      {
+        "parameters": {
+          "text": "={{ $json.data }}",
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"boolean\",\n      \"description\": \"Ürün bulunduysa true, bulunamadıysa false\"\n    },\n    \"title\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"url\": {\n      \"type\": [\"string\", \"null\"],\n      \"format\": \"uri\"\n    },\n    \"product\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"id\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"name\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"price\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"rating\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"reviews_count\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"category\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"brand\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"discount\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"image\": {\n          \"type\": [\"string\", \"null\"],\n          \"format\": \"uri\",\n          \"description\": \"Ürün görselinin geçerli bağlantısı. Sadece .jpg, .jpeg, .png, .webp uzantılarına izin verilir.\",\n          \"pattern\": \"^https?:\\\\/\\\\/.+\\\\.(jpg|jpeg|png|webp)$\"\n        }\n      },\n      \"required\": [\n        \"id\",\n        \"name\",\n        \"price\",\n        \"rating\",\n        \"reviews_count\",\n        \"category\",\n        \"brand\",\n        \"discount\",\n        \"image\"\n      ]\n    }\n  },\n  \"required\": [\"status\", \"title\", \"url\", \"product\"]\n}\n",
+          "options": {
+            "systemPromptTemplate": "Sen bir veri çıkarım uzmanısın. Sana Trendyol benzeri e-ticaret sitelerinden gelen karmaşık metinler verilecek. Amacın yalnızca **ilk ürüne ait** temel bilgileri çıkarmaktır.\n\n⛔️ Aşağıdaki kurallara **KESİNLİKLE** uymalısın:\n\n### 🔍 Ön Kontrol: Ürün var mı?\n- Eğer metin içerisinde şu tarz ifadeler geçiyorsa **ürün bulunamadı** kabul et:\n  - `\"ürün bulunamadı\"`\n  - `\"aramanız için ürün bulunamadı.\"`\n  - `\"ilgili sonuç listelenemedi\"`\n  - `\"ilginizi çekebilir\"`\n  - `\"Aşağıdakiler ilginizi çekebilir.\"`\n\n - `status`: `false` olmalı ve diğer bilgiler null dönmeli.\n\n1. Veriyi **yalnızca JSON formatında** döndür.\n2. Sadece **ilk ürünü** analiz et ve döndür.\n3. Ek açıklama, yorum, markdown veya doğal dilde metin **EKLEME**.\n4. Her alanı **şemaya uygun** şekilde doldur:\n   - `status`: Ürün bulunduysa `true`, hiç ürün yoksa `false` olmalı.\n   - Ürün yoksa diğer tüm alanlar `null` olmalı.\n   - Ürün varsa tüm bilgiler eksiksiz gelmeli.\n5. `product.image` sadece `https://` ile başlamalı ve uzantısı `.jpg`, `.jpeg`, `.png` veya `.webp` olmalı. Base64, SVG, data:image içeremez.\n6. `category` bilgisi yoksa `null` ver.\n\n\n"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1,
+        "position": [
+          660,
+          -920
+        ],
+        "id": "bbf76eee-3627-447b-83a2-98b2d9c9094d",
+        "name": "Trendyol Scraper",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "text": "={{ $json.data }}",
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"boolean\",\n      \"description\": \"Ürün bulunduysa true, bulunamadıysa false\"\n    },\n    \"title\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"url\": {\n      \"type\": [\"string\", \"null\"],\n      \"format\": \"uri\"\n    },\n    \"product\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"id\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"name\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"price\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"rating\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"reviews_count\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"category\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"brand\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"discount\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"image\": {\n          \"type\": [\"string\", \"null\"],\n          \"format\": \"uri\",\n          \"description\": \"Ürün görselinin geçerli bağlantısı. Sadece .jpg, .jpeg, .png, .webp uzantılarına izin verilir.\",\n          \"pattern\": \"^https?:\\\\/\\\\/.+\\\\.(jpg|jpeg|png|webp)$\"\n        }\n      },\n      \"required\": [\n        \"id\",\n        \"name\",\n        \"price\",\n        \"rating\",\n        \"reviews_count\",\n        \"category\",\n        \"brand\",\n        \"discount\",\n        \"image\"\n      ]\n    }\n  },\n  \"required\": [\"status\", \"title\", \"url\", \"product\"]\n}\n",
+          "options": {
+            "systemPromptTemplate": "Sen bir veri çıkarım uzmanısın. Sana Trendyol benzeri e-ticaret sitelerinden gelen karmaşık metinler verilecek. Amacın yalnızca **ilk ürüne ait** temel bilgileri çıkarmaktır.\n\n⛔️ Aşağıdaki kurallara **KESİNLİKLE** uymalısın:\n\n### 🔍 Ön Kontrol: Ürün var mı?\n- Eğer metin içerisinde şu tarz ifadeler geçiyorsa **ürün bulunamadı** kabul et:\n  - `\"ürün bulunamadı\"`\n  - `\"aramanız için ürün bulunamadı.\"`\n  - `\"ilgili sonuç listelenemedi\"`\n  - `\"ilginizi çekebilir\"`\n  - `\"Aşağıdakiler ilginizi çekebilir.\"`\n\n - `status`: `false` olmalı ve diğer bilgiler null dönmeli.\n\n1. Veriyi **yalnızca JSON formatında** döndür.\n2. Sadece **ilk ürünü** analiz et ve döndür.\n3. Ek açıklama, yorum, markdown veya doğal dilde metin **EKLEME**.\n4. Her alanı **şemaya uygun** şekilde doldur:\n   - `status`: Ürün bulunduysa `true`, hiç ürün yoksa `false` olmalı.\n   - Ürün yoksa diğer tüm alanlar `null` olmalı.\n   - Ürün varsa tüm bilgiler eksiksiz gelmeli.\n5. `product.image` sadece `https://` ile başlamalı ve uzantısı `.jpg`, `.jpeg`, `.png` veya `.webp` olmalı. Base64, SVG, data:image içeremez.\n6. `category` bilgisi yoksa `null` ver.\n\n\n"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1,
+        "position": [
+          1700,
+          -580
+        ],
+        "id": "3d16e40f-890d-49ba-bb34-e746a92fe241",
+        "name": "N11 Scraper",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "schema": {
+            "__rl": true,
+            "mode": "list",
+            "value": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "ProductTable",
+            "mode": "list",
+            "cachedResultName": "ProductTable"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "title": "={{ $json.output.title }}",
+              "url": "={{ $json.output.url }}",
+              "product": "={{ $json.output.product }}",
+              "barcode": "={{ $('Webhook').item.json.body.code }}",
+              "file_name": "={{ $json.file_name }}"
+            },
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "created_at",
+                "displayName": "created_at",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "dateTime",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "title",
+                "displayName": "title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "url",
+                "displayName": "url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "product",
+                "displayName": "product",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "object",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "barcode",
+                "displayName": "barcode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "file_name",
+                "displayName": "file_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          5460,
+          -600
+        ],
+        "id": "48efe93c-7197-45ab-bc0d-88df30ef7eef",
+        "name": "Postgres",
+        "credentials": {
+          "postgres": {
+            "id": "B15BgphA31sAj5dS",
+            "name": "Postgres account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "schema": {
+            "__rl": true,
+            "mode": "list",
+            "value": "public"
+          },
+          "table": {
+            "__rl": true,
+            "value": "ProductTable",
+            "mode": "list",
+            "cachedResultName": "ProductTable"
+          },
+          "returnAll": true,
+          "where": {
+            "values": [
+              {
+                "column": "barcode",
+                "value": "={{ $json.body.code }}"
+              }
+            ]
+          },
+          "options": {
+            "outputColumns": [
+              "product"
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          -380,
+          -920
+        ],
+        "id": "df4bd15e-6c07-437f-9fe9-0c2c239bf9c6",
+        "name": "Postgres1",
+        "alwaysOutputData": true,
+        "credentials": {
+          "postgres": {
+            "id": "B15BgphA31sAj5dS",
+            "name": "Postgres account 2"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "a8f26285-7343-4062-8a86-7c28c459c4d6",
+                "leftValue": "={{ $json.product }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -20,
+          -940
+        ],
+        "id": "6af8267d-5ac2-463b-96b2-d55e0204a8bf",
+        "name": "If4"
+      },
+      {
+        "parameters": {
+          "text": "={{ $json.data }}",
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"boolean\",\n      \"description\": \"Ürün bulunduysa true, bulunamadıysa false\"\n    },\n    \"title\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"url\": {\n      \"type\": [\"string\", \"null\"],\n      \"format\": \"uri\"\n    },\n    \"product\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"id\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"name\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"price\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"rating\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"reviews_count\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"category\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"brand\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"discount\": {\n          \"type\": [\"string\", \"null\"]\n        },\n        \"image\": {\n          \"type\": [\"string\", \"null\"],\n          \"format\": \"uri\",\n          \"description\": \"Ürün görselinin geçerli bağlantısı. Sadece .jpg, .jpeg, .png, .webp uzantılarına izin verilir.\",\n          \"pattern\": \"^https?:\\\\/\\\\/.+\\\\.(jpg|jpeg|png|webp)$\"\n        }\n      },\n      \"required\": [\n        \"id\",\n        \"name\",\n        \"price\",\n        \"rating\",\n        \"reviews_count\",\n        \"category\",\n        \"brand\",\n        \"discount\",\n        \"image\"\n      ]\n    }\n  },\n  \"required\": [\"status\", \"title\", \"url\", \"product\"]\n}\n",
+          "options": {
+            "systemPromptTemplate": "Sen bir veri çıkarım uzmanısın. Sana Trendyol benzeri e-ticaret sitelerinden gelen karmaşık metinler verilecek. Amacın yalnızca **ilk ürüne ait** temel bilgileri çıkarmaktır.\n\n⛔️ Aşağıdaki kurallara **KESİNLİKLE** uymalısın:\n\n### 🔍 Ön Kontrol: Ürün var mı?\n- Eğer metin içerisinde şu tarz ifadeler geçiyorsa **ürün bulunamadı** kabul et:\n  - `\"ürün bulunamadı\"`\n  - `\"aramanız için ürün bulunamadı.\"`\n  - `\"ilgili sonuç listelenemedi\"`\n  - `\"ilginizi çekebilir\"`\n  - `\"Aşağıdakiler ilginizi çekebilir.\"`\n\n - `status`: `false` olmalı ve diğer bilgiler null dönmeli.\n\n1. Veriyi **yalnızca JSON formatında** döndür.\n2. Sadece **ilk ürünü** analiz et ve döndür.\n3. Ek açıklama, yorum, markdown veya doğal dilde metin **EKLEME**.\n4. Her alanı **şemaya uygun** şekilde doldur:\n   - `status`: Ürün bulunduysa `true`, hiç ürün yoksa `false` olmalı.\n   - Ürün yoksa diğer tüm alanlar `null` olmalı.\n   - Ürün varsa tüm bilgiler eksiksiz gelmeli.\n5. `product.image` sadece `https://` ile başlamalı ve uzantısı `.jpg`, `.jpeg`, `.png` veya `.webp` olmalı. Base64, SVG, data:image içeremez.\n6. `category` bilgisi yoksa `null` ver.\n\n\n"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+        "typeVersion": 1,
+        "position": [
+          2560,
+          -160
+        ],
+        "id": "0f691313-ed08-460b-8fd3-7c424d0e497e",
+        "name": "Hepsiburada Scraper",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "2d6e81bf-cdbd-42d2-8c44-c0187a7695e2",
+                "name": "output",
+                "value": "={{ $('Trendyol Scraper').item.json.output }}",
+                "type": "object"
+              },
+              {
+                "id": "d0271bd2-322a-4fea-a737-cbd537e8196b",
+                "name": "file_name",
+                "value": "={{ $('Trendyol Scraper').item.json.output.product.id }}.{{ $json.format }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3300,
+          -980
+        ],
+        "id": "93354d7e-4016-4083-958d-949e4557b83f",
+        "name": "Edit Fields2",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const imageUrl = $input.first().json.output.product.image;\n\n// Resim uzantısını almak için:\nconst extension = imageUrl.substring(imageUrl.lastIndexOf('.')).toLowerCase();\n\n// Veya sadece 'jpg', 'png' gibi uzantıyı almak istersen:\nconst format = extension.replace('.', '');\n\nreturn [\n  {\n    json: {\n      imageUrl,\n      format\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3020,
+          -980
+        ],
+        "id": "a63c4bfa-83ce-4d93-97c2-f9c32fefe0fd",
+        "name": "Code2"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "2d6e81bf-cdbd-42d2-8c44-c0187a7695e2",
+                "name": "output",
+                "value": "={{ $('N11 Scraper').item.json.output }}",
+                "type": "object"
+              },
+              {
+                "id": "d0271bd2-322a-4fea-a737-cbd537e8196b",
+                "name": "file_name",
+                "value": "={{ $('N11 Scraper').item.json.output.product.id }}.{{ $json.format }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3280,
+          -620
+        ],
+        "id": "eb3f95b3-8929-48f6-a048-69195b4eb3c0",
+        "name": "Edit Fields",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const imageUrl = $input.first().json.output.product.image;\n\n// Resim uzantısını almak için:\nconst extension = imageUrl.substring(imageUrl.lastIndexOf('.')).toLowerCase();\n\n// Veya sadece 'jpg', 'png' gibi uzantıyı almak istersen:\nconst format = extension.replace('.', '');\n\nreturn [\n  {\n    json: {\n      imageUrl,\n      format\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3000,
+          -620
+        ],
+        "id": "0fe46b6b-e190-43a1-82df-5bc62baeeba0",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "2d6e81bf-cdbd-42d2-8c44-c0187a7695e2",
+                "name": "output",
+                "value": "={{ $('Hepsiburada Scraper').item.json.output }}",
+                "type": "object"
+              },
+              {
+                "id": "d0271bd2-322a-4fea-a737-cbd537e8196b",
+                "name": "file_name",
+                "value": "={{ $('Hepsiburada Scraper').item.json.output.product.id }}.{{ $json.format }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3700,
+          -200
+        ],
+        "id": "66c583d4-c19a-4bf4-8be3-b1ccab2969fc",
+        "name": "Edit Fields1",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const imageUrl = $input.first().json.output.product.image;\n\n// Resim uzantısını almak için:\nconst extension = imageUrl.substring(imageUrl.lastIndexOf('.')).toLowerCase();\n\n// Veya sadece 'jpg', 'png' gibi uzantıyı almak istersen:\nconst format = extension.replace('.', '');\n\nreturn [\n  {\n    json: {\n      imageUrl,\n      format\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3420,
+          -200
+        ],
+        "id": "d371a949-8e48-4a14-947a-0674f0cff0ca",
+        "name": "Code1"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          660,
+          -660
+        ],
+        "id": "4c11a7a9-952f-4058-ad03-a5856f030531",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "utbJqjSVfWbOeYPw",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          1700,
+          -300
+        ],
+        "id": "9b091b55-0aee-49a8-a625-f01ee73ebeb7",
+        "name": "OpenAI Chat Model1",
+        "credentials": {
+          "openAiApi": {
+            "id": "utbJqjSVfWbOeYPw",
+            "name": "OpenAi account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Trendyol Scraper",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Postgres1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Code2",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "Hepsiburada Scraper",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [
+            {
+              "node": "Code1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "HTTP Request4": {
+        "main": [
+          [
+            {
+              "node": "N11 Scraper",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If2": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trendyol Scraper": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "N11 Scraper": {
+        "main": [
+          [
+            {
+              "node": "If2",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres": {
+        "main": [
+          []
+        ]
+      },
+      "Postgres1": {
+        "main": [
+          [
+            {
+              "node": "If4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If4": {
+        "main": [
+          [],
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Hepsiburada Scraper": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Edit Fields2": {
+        "main": [
+          [
+            {
+              "node": "Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code2": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Trendyol Scraper",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "N11 Scraper",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "389f4771a46338f2518dd1f6a71708fcc96b477602b82ca04dae5b1fe1619cb7"
+    }
+  }

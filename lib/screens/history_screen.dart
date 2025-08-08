@@ -107,7 +107,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         color: const Color(0xFF2D2D2D),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: barcode.isSuccess ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+          color: barcode.isSuccess ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -119,7 +119,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: barcode.isSuccess ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                  color: barcode.isSuccess ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -135,7 +135,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getFormatColor(barcode.format).withOpacity(0.2),
+                  color: _getFormatColor(barcode.format).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -252,13 +252,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
           TextButton(
             onPressed: () async {
               await context.read<BarcodeProvider>().clearScanHistory();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Geçmiş temizlendi'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Geçmiş temizlendi'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
             },
             child: const Text(
               'Temizle',
