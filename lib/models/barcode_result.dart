@@ -4,6 +4,8 @@ class BarcodeResult {
   final DateTime timestamp;
   final bool isSuccess;
   final String? errorMessage;
+  final int stok;
+  final double fiyat;
 
   BarcodeResult({
     required this.code,
@@ -11,6 +13,8 @@ class BarcodeResult {
     required this.timestamp,
     this.isSuccess = true,
     this.errorMessage,
+    this.stok = 0,
+    this.fiyat = 0.0,
   });
 
   Map<String, dynamic> toJson() {
@@ -20,6 +24,8 @@ class BarcodeResult {
       'timestamp': timestamp.toIso8601String(),
       'isSuccess': isSuccess,
       'errorMessage': errorMessage,
+      'stok': stok,
+      'fiyat': fiyat,
     };
   }
 
@@ -30,6 +36,8 @@ class BarcodeResult {
       timestamp: DateTime.parse(json['timestamp']),
       isSuccess: json['isSuccess'] ?? true,
       errorMessage: json['errorMessage'],
+      stok: json['stok'] ?? 0,
+      fiyat: (json['fiyat'] ?? 0.0).toDouble(),
     );
   }
 } 

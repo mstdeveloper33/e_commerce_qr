@@ -13,28 +13,29 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen> {
   MobileScannerController? _scannerController;
   bool _hasPermission = false;
-  bool _isActive = true;
+  bool _isStockEntryMode = false;
+  
+  // Stok ve fiyat input kontrolcüleri
+  final TextEditingController _stokController = TextEditingController();
+  final TextEditingController _fiyatController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _checkPermission();
+    _initializeCamera();
   }
 
-  Future<void> _checkPermission() async {
+  Future<void> _initializeCamera() async {
     final status = await Permission.camera.request();
     if (status.isGranted) {
       setState(() {
         _hasPermission = true;
       });
       _scannerController = MobileScannerController(
-        // Yalnızca EAN-13 okut
         formats: const [BarcodeFormat.ean13],
-        // Normal hızda algılama (duplikasyon kontrolü Provider'da)
         detectionSpeed: DetectionSpeed.normal,
       );
     }
@@ -42,39 +43,159 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _scannerController?.dispose();
+    try {
+      _scannerController?.dispose();
+    } catch (e) {
+      print('Scanner dispose hatası: $e');
+    }
+    _stokController.dispose();
+    _fiyatController.dispose();
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (_scannerController == null) return;
+  void _showStokFiyatDialog(String barkod, String format) {
+    _stokController.clear();
+    _fiyatController.clear();
     
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (_isActive) {
-          _scannerController?.start();
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.hidden:
-      case AppLifecycleState.detached:
-        _scannerController?.stop();
-        break;
+    // Dialog açılırken kamerayı durdur
+    try {
+      _scannerController?.stop();
+    } catch (e) {
+      print('Kamera durdurma hatası (dialog): $e');
     }
-  }
 
-  void _pauseCamera() {
-    _isActive = false;
-    _scannerController?.stop();
-  }
-
-  void _resumeCamera() {
-    _isActive = true;
-    _scannerController?.start();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Validation kontrolleri
+            final stokText = _stokController.text;
+            final fiyatText = _fiyatController.text;
+            final stok = int.tryParse(stokText) ?? 0;
+            final fiyat = double.tryParse(fiyatText) ?? 0.0;
+            final isValid = stok >= 1 && fiyat > 0;
+            
+            return AlertDialog(
+          backgroundColor: const Color(0xFF2D2D2D),
+          title: const Text(
+            'Stok ve Fiyat Bilgisi',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Barkod: $barkod',
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontFamily: 'monospace',
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _stokController,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white),
+                onChanged: (value) => setState(() {}), // Validation için rebuild
+                decoration: InputDecoration(
+                  labelText: 'Stok Miktarı (En az 1)',
+                  labelStyle: TextStyle(
+                    color: stok < 1 && stokText.isNotEmpty ? Colors.red : Colors.grey,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: stok < 1 && stokText.isNotEmpty ? Colors.red : Colors.grey,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: stok < 1 && stokText.isNotEmpty ? Colors.red : Colors.blue,
+                    ),
+                  ),
+                  errorText: stok < 1 && stokText.isNotEmpty ? 'Stok adedi en az 1 olmalı' : null,
+                  errorStyle: const TextStyle(color: Colors.red),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _fiyatController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: const TextStyle(color: Colors.white),
+                onChanged: (value) => setState(() {}), // Validation için rebuild
+                decoration: InputDecoration(
+                  labelText: 'Fiyat (₺) - Zorunlu',
+                  labelStyle: TextStyle(
+                    color: fiyat <= 0 && fiyatText.isNotEmpty ? Colors.red : Colors.grey,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: fiyat <= 0 && fiyatText.isNotEmpty ? Colors.red : Colors.grey,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: fiyat <= 0 && fiyatText.isNotEmpty ? Colors.red : Colors.blue,
+                    ),
+                  ),
+                  errorText: fiyat <= 0 && fiyatText.isNotEmpty ? 'Fiyat 0\'dan büyük olmalı' : null,
+                  errorStyle: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Dialog kapandıktan sonra kamerayı tekrar başlat
+                try {
+                  _scannerController?.start();
+                } catch (e) {
+                  print('Kamera başlatma hatası (iptal): $e');
+                }
+              },
+              child: const Text(
+                'İptal',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: isValid ? () {
+                final stok = int.tryParse(_stokController.text) ?? 0;
+                final fiyat = double.tryParse(_fiyatController.text) ?? 0.0;
+                
+                Navigator.of(context).pop();
+                
+                // Provider'dan stok ve fiyat ile barkod gönder
+                final provider = Provider.of<BarcodeProvider>(context, listen: false);
+                provider.scanAndSendBarcodeWithDetails(barkod, format, stok, fiyat);
+                
+                // Dialog kapandıktan sonra kamerayı tekrar başlat
+                try {
+                  _scannerController?.start();
+                } catch (e) {
+                  print('Kamera başlatma hatası (kaydet): $e');
+                }
+              } : null, // Geçerli değilse buton pasif
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isValid ? Colors.blue : Colors.grey,
+                disabledBackgroundColor: Colors.grey,
+              ),
+              child: Text(
+                'Kaydet',
+                style: TextStyle(
+                  color: isValid ? Colors.white : Colors.grey[400],
+                ),
+              ),
+            ),
+          ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -95,30 +216,50 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () async {
-              _pauseCamera();
+              try {
+                _scannerController?.stop();
+              } catch (e) {
+                print('Kamera durdurma hatası (history): $e');
+              }
+              
               await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HistoryScreen()),
               );
-              _resumeCamera();
+              
+              try {
+                _scannerController?.start();
+              } catch (e) {
+                print('Kamera başlatma hatası (history): $e');
+              }
             },
           ),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () async {
-              _pauseCamera();
+              try {
+                _scannerController?.stop();
+              } catch (e) {
+                print('Kamera durdurma hatası (settings): $e');
+              }
+              
               await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
-              _resumeCamera();
+              
+              try {
+                _scannerController?.start();
+              } catch (e) {
+                print('Kamera başlatma hatası (settings): $e');
+              }
             },
           ),
         ],
       ),
       body: Column(
         children: [
-          // Kamera alanı - Consumer dışında (rebuild'den korunuyor)
+          // Kamera alanı
           Expanded(
             flex: 2,
             child: Container(
@@ -137,14 +278,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           if (barcodes.isNotEmpty) {
                             final barcode = barcodes.first;
                             if (barcode.rawValue != null) {
-                              // Provider'dan isScanning kontrolü al (listen: false)
                               final provider = Provider.of<BarcodeProvider>(context, listen: false);
+                              
+                              // Çift okumayı engelle
                               if (provider.isScanning || provider.isLoading) return;
                               
-                              provider.scanAndSendBarcode(
-                                barcode.rawValue!,
-                                barcode.format.name,
-                              );
+                              // Stok modu aktifse dialog aç, değilse direkt gönder
+                              if (_isStockEntryMode) {
+                                _showStokFiyatDialog(
+                                  barcode.rawValue!,
+                                  barcode.format.name,
+                                );
+                              } else {
+                                provider.scanAndSendBarcode(
+                                  barcode.rawValue!,
+                                  barcode.format.name,
+                                );
+                              }
                             }
                           }
                         },
@@ -169,13 +319,39 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
           
-          // UI bilgileri - Consumer içinde (sadece UI rebuild)
+          // UI bilgileri
           Expanded(
             flex: 3,
             child: Consumer<BarcodeProvider>(
               builder: (context, provider, child) {
                 return Column(
                   children: [
+                    // Stok modu bilgisi
+                    if (_isStockEntryMode)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                        decoration: BoxDecoration(
+                          // ignore: deprecated_member_use
+                          color: Colors.blue.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.blueAccent, width: 1.5),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.inventory_2, color: Colors.blueAccent, size: 20),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Stok kaydı modu aktif: Barkodu okuttuktan sonra stok ve fiyat girin',
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     // API durumu
                     if (provider.apiSettings?.apiUrl.isNotEmpty == true)
                       Container(
@@ -227,15 +403,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.orange, width: 2),
                         ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(Icons.warning, color: Colors.orange, size: 24),
-                            const SizedBox(width: 12),
+                            Icon(Icons.warning, color: Colors.orange, size: 24),
+                            SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Test Modu',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -243,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       fontSize: 16,
                                     ),
                                   ),
-                                  const Text(
+                                  Text(
                                     'Ayarlar sayfasından API URL\'ini girin',
                                     style: TextStyle(
                                       color: Colors.grey,
@@ -264,6 +440,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         padding: const EdgeInsets.all(16),
                         margin: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
+                          // ignore: deprecated_member_use
                           color: Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.red, width: 1),
@@ -359,6 +536,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          setState(() {
+            _isStockEntryMode = !_isStockEntryMode;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_isStockEntryMode
+                  ? 'Stok kaydı modu aktif. Barkodu okuttuktan sonra stok ve fiyat girin.'
+                  : 'Normal tarama moduna geçildi.'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        },
+        backgroundColor: _isStockEntryMode ? Colors.blueAccent : const Color(0xFF3D3D3D),
+        label: Row(
+          children: const [
+            Icon(Icons.inventory_2, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'Stok Kaydı',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

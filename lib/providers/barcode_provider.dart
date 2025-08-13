@@ -18,9 +18,9 @@ class BarcodeProvider extends ChangeNotifier {
   
   // Performans optimizasyonu için
   Timer? _debounceTimer;
-  Set<String> _recentlyScanned = {};
-  static const Duration _debounceDelay = Duration(milliseconds: 500);
-  static const Duration _recentlyScannedTimeout = Duration(milliseconds: 1500);
+  final Set<String> _recentlyScanned = {};
+  static const Duration _debounceDelay = Duration(milliseconds: 800);
+  static const Duration _recentlyScannedTimeout = Duration(milliseconds: 2000);
 
   // Getters
   bool get isScanning => _isScanning;
@@ -69,11 +69,8 @@ class BarcodeProvider extends ChangeNotifier {
 
   // Barkod tara ve API'ye gönder (basitleştirilmiş)
   Future<void> scanAndSendBarcode(String code, String format) async {
-    print('🔍 Barkod taranıyor: $code ($format)');
-    
     // Aynı barkod son 2 saniyede taranmışsa tekrar işleme
-    if (_recentlyScanned.contains(code)) {
-      print('⚠️ Aynı barkod zaten taranmış: $code');
+    if (_recentlyScanned.contains(code) || _isScanning || _isLoading) {
       return;
     }
 
@@ -86,22 +83,36 @@ class BarcodeProvider extends ChangeNotifier {
 
     // Yeni debounce timer başlat
     _debounceTimer = Timer(_debounceDelay, () async {
-      await _processBarcode(code, format);
+      await _processBarcode(code, format, 0, 0.0);
     });
   }
 
-  // Barkod işleme (debounce sonrası)
-  Future<void> _processBarcode(String code, String format) async {
-    print('📝 Barkod işleniyor: $code ($format)');
+  // Stok ve fiyat bilgisi ile barkod tara ve API'ye gönder
+  Future<void> scanAndSendBarcodeWithDetails(String code, String format, int stok, double fiyat) async {
+    // Aynı barkod son 2 saniyede taranmışsa tekrar işleme
+    if (_recentlyScanned.contains(code) || _isScanning || _isLoading) {
+      return;
+    }
 
+    // Tarama durumunu aktif et
+    _isScanning = true;
+    notifyListeners();
+
+    // Debounce timer'ı iptal et
+    _debounceTimer?.cancel();
+
+    // Direkt olarak işle (dialog'dan geldiği için debounce gerek yok)
+    await _processBarcode(code, format, stok, fiyat);
+  }
+
+  // Barkod işleme (debounce sonrası)
+  Future<void> _processBarcode(String code, String format, [int stok = 0, double fiyat = 0.0]) async {
     if (_recentlyScanned.contains(code)) {
-      print('⚠️ Aynı barkod zaten işlenmiş: $code');
       return;
     }
     
-    // Kodu hemen koruma altına al - 3 saniye boyunca aynı kod işlenmeyecek
+    // Kodu hemen koruma altına al - 2 saniye boyunca aynı kod işlenmeyecek
     _recentlyScanned.add(code);
-    print('🔒 Kod koruma altına alındı: $code');
 
     _isLoading = true;
     _lastError = '';
@@ -116,10 +127,11 @@ class BarcodeProvider extends ChangeNotifier {
           timestamp: DateTime.now(),
           isSuccess: false,
           errorMessage: 'Geçersiz barkod veya format',
+          stok: stok,
+          fiyat: fiyat,
         );
         _scanHistory.insert(0, failResult);
         _lastError = 'Geçersiz barkod veya format';
-        print('❌ Geçersiz barkod: $code');
         return;
       }
 
@@ -128,11 +140,10 @@ class BarcodeProvider extends ChangeNotifier {
         format: format,
         timestamp: DateTime.now(),
         isSuccess: true,
+        stok: stok,
+        fiyat: fiyat,
       );
-      print('📊 Barkod sonucu oluşturuldu: ${result.code}');
-
       if (_apiSettings == null || _apiSettings!.apiUrl.isEmpty) {
-        print('🧪 Test modu: Barkod geçmişe ekleniyor');
         _lastScannedBarcode = code;
         
         // Aynı barkod zaten varsa güncelle, yoksa ekle
@@ -140,7 +151,6 @@ class BarcodeProvider extends ChangeNotifier {
         if (existingIndex != -1) {
           // Varolan barkodu güncelle ve en üste taşı
           _scanHistory.removeAt(existingIndex);
-          print('🔄 Test modu: Varolan barkod güncellendi: $code');
         }
         _scanHistory.insert(0, result);
         
@@ -151,7 +161,6 @@ class BarcodeProvider extends ChangeNotifier {
         // Geçmişi kaydet
         await _storageService.saveScanHistory(_scanHistory);
         _lastError = 'Test modu: Barkod kaydedildi (API URL ayarlanmamış)';
-        print('✅ Test modu: Barkod başarıyla kaydedildi. Geçmiş sayısı: ${_scanHistory.length}');
       } else {
         print('🌐 API modu: Barkod API\'ye gönderiliyor');
         final success = await _apiService.sendBarcodeResult(result);
@@ -181,6 +190,8 @@ class BarcodeProvider extends ChangeNotifier {
             timestamp: DateTime.now(),
             isSuccess: false,
             errorMessage: 'API\'ye gönderilemedi',
+            stok: stok,
+            fiyat: fiyat,
           );
           
           // Aynı barkod zaten varsa güncelle, yoksa ekle
@@ -205,6 +216,8 @@ class BarcodeProvider extends ChangeNotifier {
         timestamp: DateTime.now(),
         isSuccess: false,
         errorMessage: e.toString(),
+        stok: stok,
+        fiyat: fiyat,
       );
       
       // Aynı barkod zaten varsa güncelle, yoksa ekle
@@ -307,12 +320,8 @@ class BarcodeProvider extends ChangeNotifier {
 
   // Debug: Geçmiş durumunu yazdır
   void debugPrintHistory() {
-    print('📋 Geçmiş durumu:');
-    print('   - Toplam kayıt: ${_scanHistory.length}');
-    for (int i = 0; i < _scanHistory.length; i++) {
-      final item = _scanHistory[i];
-      print('   ${i + 1}. ${item.code} (${item.format}) - ${item.timestamp}');
-    }
+    // Debug çıktısını azalt
+    print('📋 Geçmiş durumu: ${_scanHistory.length} kayıt');
   }
 
   @override

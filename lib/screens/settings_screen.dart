@@ -302,8 +302,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
+                  // ignore: deprecated_member_use
                   color: Colors.blue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
+                  // ignore: deprecated_member_use
                   border: Border.all(color: Colors.blue.withOpacity(0.3)),
                 ),
                 child: const Column(
