@@ -173,6 +173,69 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 style: const TextStyle(color: Colors.red, fontSize: 13),
               ),
             ),
+          // Stok ve fiyat bilgileri
+          if (barcode.stok > 0 || barcode.fiyat > 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  if (barcode.stok > 0) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.inventory_2,
+                            color: Colors.blue,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Stok: ${barcode.stok}',
+                            style: const TextStyle(
+                              color: Colors.blue,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (barcode.stok > 0 && barcode.fiyat > 0)
+                    const SizedBox(width: 8),
+                  if (barcode.fiyat > 0) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const 
+                           SizedBox(width: 4),
+                          Text(
+                            '${barcode.fiyat.toStringAsFixed(2)} ₺',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           const SizedBox(height: 8),
           Row(
             children: [
